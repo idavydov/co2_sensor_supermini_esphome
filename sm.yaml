@@ -65,6 +65,23 @@ sensor:
       id: senseair_co2
     update_interval: 10s
     id: senseair_s8
+  - platform: bme680
+    i2c_id: bus_a
+    temperature:
+      name: "BME680 Temperature"
+      id: temp
+      oversampling: 16x
+    pressure:
+      id: pressure
+      name: "BME680 Pressure"
+    humidity:
+      id: humidity
+      name: "BME680 Humidity"
+    gas_resistance:
+      name: "BME680 Gas Resistance"
+      id: gas
+    address: 0x77
+    update_interval: 60s
 
 output:
   - platform: gpio
@@ -72,12 +89,15 @@ output:
     id: gpio_led
 
 font:
-  - file: "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf"
+  - file: "/usr/share/fonts/truetype/terminus/TerminusTTF-4.46.0.ttf"
     id: large_font
-    size: 28
-  - file: "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf"
+    size: 32
+  - file: "/usr/share/fonts/truetype/terminus/TerminusTTF-4.46.0.ttf"
+    id: medium_font
+    size: 20
+  - file: "/usr/share/fonts/truetype/terminus/TerminusTTF-4.46.0.ttf"
     id: small_font
-    size: 8
+    size: 14
 
 display:
   - platform: ssd1306_i2c
@@ -87,5 +107,9 @@ display:
     i2c_id: bus_a
     id: my_display
     lambda: |-
-      it.printf(-2, 5, id(large_font), COLOR_ON, "%.0f", id(senseair_co2).state);
+      it.print(0, 4, id(medium_font), COLOR_ON, "CO");
+      it.print(20, 10, id(small_font), COLOR_ON, "2");
+      it.printf(75, 14, id(large_font), COLOR_ON, TextAlign::CENTER, "%.0f", id(senseair_co2).state);
+      it.printf(0, 28, id(medium_font), COLOR_ON, "%.0f°C %.0f%%", id(temp).state, id(humidity).state);
+      it.printf(0, 50, id(small_font), COLOR_ON, "%.0fhPa", id(pressure).state);
 
