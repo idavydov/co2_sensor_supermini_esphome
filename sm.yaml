@@ -1,0 +1,53 @@
+esphome:
+  name: sm
+
+esp32:
+  board: esp32-c3-devkitm-1
+  framework:
+    type: arduino
+
+# Enable logging
+logger:
+
+i2c:
+  - id: bus_a
+    sda: GPIO7
+    scl: GPIO9
+    frequency: 800kHz
+
+uart:
+  rx_pin: GPIO20
+  tx_pin: GPIO21
+  baud_rate: 9600
+
+sensor:
+  - platform: senseair
+    co2:
+      name: "SenseAir CO2 Value"
+      id: senseair_co2
+    update_interval: 10s
+    id: senseair_s8
+
+output:
+  - platform: gpio
+    pin: GPIO8
+    id: gpio_led
+
+font:
+  - file: "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf"
+    id: large_font
+    size: 28
+  - file: "/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf"
+    id: small_font
+    size: 8
+
+display:
+  - platform: ssd1306_i2c
+    brightness: 100%
+    model: "SSD1306 128x64"
+    address: 0x3C
+    i2c_id: bus_a
+    id: my_display
+    lambda: |-
+      it.printf(-2, 5, id(large_font), COLOR_ON, "%.0f", id(senseair_co2).state);
+
