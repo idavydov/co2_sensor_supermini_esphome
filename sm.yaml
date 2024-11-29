@@ -20,6 +20,44 @@ uart:
   tx_pin: GPIO21
   baud_rate: 9600
 
+# buttons
+binary_sensor:
+  - platform: gpio
+    id: top
+    pin:
+      number: GPIO0
+      mode:
+        input: true
+        pullup: true
+  - platform: gpio
+    id: left
+    pin:
+      number: GPIO1
+      mode:
+        input: true
+        pullup: true
+  - platform: gpio
+    id: bottom
+    pin:
+      number: GPIO2
+      mode:
+        input: true
+        pullup: true
+  - platform: gpio
+    id: right
+    pin:
+      number: GPIO3
+      mode:
+        input: true
+        pullup: true
+  - platform: gpio
+    id: press
+    pin:
+      number: GPIO4
+      mode:
+        input: true
+        pullup: true
+
 sensor:
   - platform: senseair
     co2:
