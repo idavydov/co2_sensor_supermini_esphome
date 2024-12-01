@@ -242,20 +242,34 @@ display:
 interval:
   - interval: 1s
     then:
+      - lambda: |-
+          static int seconds = 0;
+          seconds = (seconds + 1) % 60;
+          if (
+            id(high_co2).state == "LED" &&
+            id(senseair_co2).state > id(co2_thr).state &&
+            seconds % 2 == 0
+          ) {
+            id(gpio_led).turn_on();
+          } else {
+            id(gpio_led).turn_off();
+          }
       - if:
           condition:
             not:
               display_menu.is_active: my_menu
           then:
             - display.page.show: !lambda |-
-                static int last = 0;
+                static int seconds = 0;
+                int off;
+                seconds = (seconds + 1) % 60;
                 if (
                   id(high_co2).state == "blink" &&
                   id(senseair_co2).state > id(co2_thr).state
                 ) {
-                  last = (last+1)%2;
+                  off = seconds % 2;
                 } else {
-                  last = 1;
+                  off = 1;
                 }
-                return last ? id(co2_page) : id(co2_page_inv);
+                return off ? id(co2_page) : id(co2_page_inv);
             - component.update: my_display
