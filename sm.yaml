@@ -199,6 +199,9 @@ output:
     inverted: true
 
 font:
+  - file: "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
+    id: huge_font
+    size: 45
   - file: "/usr/share/fonts/truetype/terminus/TerminusTTF-4.46.0.ttf"
     id: large_font
     size: 32
@@ -223,21 +226,29 @@ display:
       - id: co2_page
         lambda: |-
           it.fill(COLOR_OFF);
-          it.print(0, 4, id(medium_font), COLOR_ON, "CO");
-          it.print(20, 10, id(small_font), COLOR_ON, "2");
-          it.printf(75, 14, id(large_font), COLOR_ON, TextAlign::CENTER, "%.0f", id(senseair_co2).state);
-          it.printf(0, 28, id(medium_font), COLOR_ON, "%.0f°C %.0f%%", id(temp).state, id(humidity).state);
-          it.printf(0, 50, id(small_font), COLOR_ON, "%.0fhPa IAQ %.0f%c", id(pressure).state, id(iaq).state,
-            (id(iaq_accuracy).state == 3 ? ' ' : '?') );
+          if (id(only_co2).state) {
+            it.printf(64, 32, id(huge_font), COLOR_ON, TextAlign::CENTER, "%.0f", id(senseair_co2).state);
+          } else {
+            it.print(0, 4, id(medium_font), COLOR_ON, "CO");
+            it.print(20, 10, id(small_font), COLOR_ON, "2");
+            it.printf(75, 14, id(large_font), COLOR_ON, TextAlign::CENTER, "%.0f", id(senseair_co2).state);
+            it.printf(0, 28, id(medium_font), COLOR_ON, "%.0f°C %.0f%%", id(temp).state, id(humidity).state);
+            it.printf(0, 50, id(small_font), COLOR_ON, "%.0fhPa IAQ %.0f%c", id(pressure).state, id(iaq).state,
+              (id(iaq_accuracy).state == 3 ? ' ' : '?') );
+          }
       - id: co2_page_inv
         lambda: |-
           it.fill(COLOR_ON);
-          it.print(0, 4, id(medium_font), COLOR_OFF, "CO");
-          it.print(20, 10, id(small_font), COLOR_OFF, "2");
-          it.printf(75, 14, id(large_font), COLOR_OFF, TextAlign::CENTER, "%.0f", id(senseair_co2).state);
-          it.printf(0, 28, id(medium_font), COLOR_OFF, "%.0f°C %.0f%%", id(temp).state, id(humidity).state);
-          it.printf(0, 50, id(small_font), COLOR_OFF, "%.0fhPa IAQ %.0f%c", id(pressure).state, id(iaq).state,
-            (id(iaq_accuracy).state == 3 ? ' ' : '?') );
+          if (id(only_co2).state) {
+            it.printf(64, 32, id(huge_font), COLOR_OFF, TextAlign::CENTER, "%.0f", id(senseair_co2).state);
+          } else {
+            it.print(0, 4, id(medium_font), COLOR_OFF, "CO");
+            it.print(20, 10, id(small_font), COLOR_OFF, "2");
+            it.printf(75, 14, id(large_font), COLOR_OFF, TextAlign::CENTER, "%.0f", id(senseair_co2).state);
+            it.printf(0, 28, id(medium_font), COLOR_OFF, "%.0f°C %.0f%%", id(temp).state, id(humidity).state);
+            it.printf(0, 50, id(small_font), COLOR_OFF, "%.0fhPa IAQ %.0f%c", id(pressure).state, id(iaq).state,
+              (id(iaq_accuracy).state == 3 ? ' ' : '?') );
+          }
 
 interval:
   - interval: 1s
