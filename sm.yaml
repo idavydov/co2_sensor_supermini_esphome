@@ -98,6 +98,7 @@ output:
   - platform: gpio
     pin: GPIO8
     id: gpio_led
+    inverted: true
 
 font:
   - file: "/usr/share/fonts/truetype/terminus/TerminusTTF-4.46.0.ttf"
