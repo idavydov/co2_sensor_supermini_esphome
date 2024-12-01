@@ -23,12 +23,18 @@ uart:
 # buttons
 binary_sensor:
   - platform: gpio
-    id: top
+    id: up
     pin:
       number: GPIO0
       mode:
         input: true
         pullup: true
+      inverted: true
+    filters:
+      - delayed_on: 10ms
+      - delayed_off: 10ms
+    on_press:
+      - display_menu.up:
   - platform: gpio
     id: left
     pin:
@@ -36,13 +42,25 @@ binary_sensor:
       mode:
         input: true
         pullup: true
+      inverted: true
+    filters:
+      - delayed_on: 10ms
+      - delayed_off: 10ms
+    on_press:
+      - display_menu.left:
   - platform: gpio
-    id: bottom
+    id: down
     pin:
       number: GPIO2
       mode:
         input: true
         pullup: true
+      inverted: true
+    filters:
+      - delayed_on: 10ms
+      - delayed_off: 10ms
+    on_press:
+      - display_menu.down:
   - platform: gpio
     id: right
     pin:
@@ -50,6 +68,12 @@ binary_sensor:
       mode:
         input: true
         pullup: true
+      inverted: true
+    filters:
+      - delayed_on: 10ms
+      - delayed_off: 10ms
+    on_press:
+      - display_menu.right:
   - platform: gpio
     id: press
     pin:
@@ -57,6 +81,80 @@ binary_sensor:
       mode:
         input: true
         pullup: true
+      inverted: true
+    filters:
+      - delayed_on: 10ms
+      - delayed_off: 10ms
+    on_press:
+      - if:
+          condition:
+            display_menu.is_active: my_menu
+          then:
+            - display_menu.enter: my_menu
+          else:
+            - display_menu.show_main:  my_menu
+
+# Declare a LCD menu
+graphical_display_menu:
+  id: my_menu
+  display: my_display
+  font: tiny_font
+  active: false
+  mode: joystick
+  on_redraw:
+    then:
+      component.update: my_display
+  on_enter:
+    then:
+      lambda: 'ESP_LOGI("display_menu", "root enter");'
+  on_leave:
+    then:
+      lambda: 'ESP_LOGI("display_menu", "root leave");'
+  items:
+    - type: switch
+      immediate_edit: true
+      text: "Show CO2 only"
+      switch: only_co2
+    - type: select
+      immediate_edit: true
+      text: "On high CO2"
+      select: high_co2
+    - type: number
+      immediate_edit: false
+      text: "CO2 threshold"
+      number: co2_thr
+      format: "%.0f"
+    - type: command
+      text: 'Calibrate to 400'
+    - type: command
+      text: '[exit]'
+      on_value:
+        then:
+          - display_menu.hide: my_menu
+
+switch:
+  - platform: template
+    id: only_co2
+    optimistic: true
+
+select:
+  - platform: template
+    id: high_co2
+    optimistic: true
+    options:
+      - 'blink'
+      - 'LED'
+      - 'off'
+
+number:
+  - platform: template
+    id: co2_thr
+    optimistic: true
+    min_value: 800.
+    max_value: 2000.
+    step: 100
+
+
 
 bme68x_bsec2_i2c:
   i2c_id: bus_a
@@ -71,7 +169,7 @@ sensor:
     co2:
       name: "SenseAir CO2 Value"
       id: senseair_co2
-    update_interval: 10s
+    update_interval: 30s
     id: senseair_s8
   - platform: bme68x_bsec2
     temperature:
@@ -121,11 +219,13 @@ display:
     address: 0x3C
     i2c_id: bus_a
     id: my_display
-    lambda: |-
-      it.print(0, 4, id(medium_font), COLOR_ON, "CO");
-      it.print(20, 10, id(small_font), COLOR_ON, "2");
-      it.printf(75, 14, id(large_font), COLOR_ON, TextAlign::CENTER, "%.0f", id(senseair_co2).state);
-      it.printf(0, 28, id(medium_font), COLOR_ON, "%.0f°C %.0f%%", id(temp).state, id(humidity).state);
-      it.printf(0, 50, id(small_font), COLOR_ON, "%.0fhPa IAQ %.0f%c", id(pressure).state, id(iaq).state,
-        (id(iaq_accuracy).state == 3 ? ' ' : '?') );
+    pages:
+      - id: graph_page
+        lambda: |-
+          it.print(0, 4, id(medium_font), COLOR_ON, "CO");
+          it.print(20, 10, id(small_font), COLOR_ON, "2");
+          it.printf(75, 14, id(large_font), COLOR_ON, TextAlign::CENTER, "%.0f", id(senseair_co2).state);
+          it.printf(0, 28, id(medium_font), COLOR_ON, "%.0f°C %.0f%%", id(temp).state, id(humidity).state);
+          it.printf(0, 50, id(small_font), COLOR_ON, "%.0fhPa IAQ %.0f%c", id(pressure).state, id(iaq).state,
+            (id(iaq_accuracy).state == 3 ? ' ' : '?') );
 
