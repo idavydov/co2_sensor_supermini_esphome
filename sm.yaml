@@ -126,6 +126,12 @@ graphical_display_menu:
       format: "%.0f"
     - type: command
       text: 'Calibrate to 400'
+      on_value:
+        then:
+          - senseair.background_calibration: senseair_s8
+          - display_menu.hide: my_menu
+          - delay: 60s
+          - senseair.background_calibration_result: senseair_s8
     - type: command
       text: '[exit]'
       on_value:
