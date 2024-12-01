@@ -220,12 +220,42 @@ display:
     i2c_id: bus_a
     id: my_display
     pages:
-      - id: graph_page
+      - id: co2_page
         lambda: |-
+          it.fill(COLOR_OFF);
           it.print(0, 4, id(medium_font), COLOR_ON, "CO");
           it.print(20, 10, id(small_font), COLOR_ON, "2");
           it.printf(75, 14, id(large_font), COLOR_ON, TextAlign::CENTER, "%.0f", id(senseair_co2).state);
           it.printf(0, 28, id(medium_font), COLOR_ON, "%.0f°C %.0f%%", id(temp).state, id(humidity).state);
           it.printf(0, 50, id(small_font), COLOR_ON, "%.0fhPa IAQ %.0f%c", id(pressure).state, id(iaq).state,
             (id(iaq_accuracy).state == 3 ? ' ' : '?') );
+      - id: co2_page_inv
+        lambda: |-
+          it.fill(COLOR_ON);
+          it.print(0, 4, id(medium_font), COLOR_OFF, "CO");
+          it.print(20, 10, id(small_font), COLOR_OFF, "2");
+          it.printf(75, 14, id(large_font), COLOR_OFF, TextAlign::CENTER, "%.0f", id(senseair_co2).state);
+          it.printf(0, 28, id(medium_font), COLOR_OFF, "%.0f°C %.0f%%", id(temp).state, id(humidity).state);
+          it.printf(0, 50, id(small_font), COLOR_OFF, "%.0fhPa IAQ %.0f%c", id(pressure).state, id(iaq).state,
+            (id(iaq_accuracy).state == 3 ? ' ' : '?') );
 
+interval:
+  - interval: 1s
+    then:
+      - if:
+          condition:
+            not:
+              display_menu.is_active: my_menu
+          then:
+            - display.page.show: !lambda |-
+                static int last = 0;
+                if (
+                  id(high_co2).state == "blink" &&
+                  id(senseair_co2).state > id(co2_thr).state
+                ) {
+                  last = (last+1)%2;
+                } else {
+                  last = 1;
+                }
+                return last ? id(co2_page) : id(co2_page_inv);
+            - component.update: my_display
