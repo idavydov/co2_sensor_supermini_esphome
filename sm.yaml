@@ -58,6 +58,14 @@ binary_sensor:
         input: true
         pullup: true
 
+bme68x_bsec2_i2c:
+  i2c_id: bus_a
+  address: 0x77
+  model: bme680
+  operating_age: 28d
+  sample_rate: LP
+  supply_voltage: 3.3V
+
 sensor:
   - platform: senseair
     co2:
@@ -65,23 +73,26 @@ sensor:
       id: senseair_co2
     update_interval: 10s
     id: senseair_s8
-  - platform: bme680
-    i2c_id: bus_a
+  - platform: bme68x_bsec2
     temperature:
-      name: "BME680 Temperature"
+      name: "BME68x Temperature"
       id: temp
-      oversampling: 16x
     pressure:
       id: pressure
-      name: "BME680 Pressure"
+      name: "BME68x Pressure"
     humidity:
       id: humidity
-      name: "BME680 Humidity"
-    gas_resistance:
-      name: "BME680 Gas Resistance"
-      id: gas
-    address: 0x77
-    update_interval: 60s
+      name: "BME68x Humidity"
+    iaq:
+      name: "BME68x IAQ"
+      id: iaq
+    iaq_accuracy:
+      name: "BME68x IAQ Accuarcy"
+      id: iaq_accuracy
+    co2_equivalent:
+      name: "BME68x CO2 Equivalent"
+    breath_voc_equivalent:
+      name: "BME68x Breath VOC Equivalent"
 
 output:
   - platform: gpio
@@ -98,6 +109,9 @@ font:
   - file: "/usr/share/fonts/truetype/terminus/TerminusTTF-4.46.0.ttf"
     id: small_font
     size: 14
+  - file: "/usr/share/fonts/truetype/terminus/TerminusTTF-4.46.0.ttf"
+    id: tiny_font
+    size: 12
 
 display:
   - platform: ssd1306_i2c
@@ -111,5 +125,6 @@ display:
       it.print(20, 10, id(small_font), COLOR_ON, "2");
       it.printf(75, 14, id(large_font), COLOR_ON, TextAlign::CENTER, "%.0f", id(senseair_co2).state);
       it.printf(0, 28, id(medium_font), COLOR_ON, "%.0f°C %.0f%%", id(temp).state, id(humidity).state);
-      it.printf(0, 50, id(small_font), COLOR_ON, "%.0fhPa", id(pressure).state);
+      it.printf(0, 50, id(small_font), COLOR_ON, "%.0fhPa IAQ %.0f%c", id(pressure).state, id(iaq).state,
+        (id(iaq_accuracy).state == 3 ? ' ' : '?') );
 
