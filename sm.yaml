@@ -142,11 +142,13 @@ switch:
   - platform: template
     id: only_co2
     optimistic: true
+    restore_mode: RESTORE_DEFAULT_OFF
 
 select:
   - platform: template
     id: high_co2
     optimistic: true
+    restore_value: true
     options:
       - 'blink'
       - 'LED'
@@ -158,6 +160,7 @@ number:
     optimistic: true
     min_value: 800.
     max_value: 2000.
+    restore_value: true
     step: 100
 
 
