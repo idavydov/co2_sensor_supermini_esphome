@@ -12,7 +12,7 @@ logger:
 i2c:
   - id: bus_a
     sda: GPIO7
-    scl: GPIO9
+    scl: GPIO10
     frequency: 800kHz
 
 uart:
@@ -51,7 +51,7 @@ binary_sensor:
   - platform: gpio
     id: down
     pin:
-      number: GPIO2
+      number: GPIO3
       mode:
         input: true
         pullup: true
@@ -64,7 +64,7 @@ binary_sensor:
   - platform: gpio
     id: right
     pin:
-      number: GPIO3
+      number: GPIO4
       mode:
         input: true
         pullup: true
@@ -77,7 +77,7 @@ binary_sensor:
   - platform: gpio
     id: press
     pin:
-      number: GPIO4
+      number: GPIO5
       mode:
         input: true
         pullup: true
